@@ -34,6 +34,11 @@ function render(json) {
 
   const p1 = createPara(`Location: ${json.location.name}, ${json.location.country}`);
   const p2 = createPara(`Temperature now: ${json.current.temp_c}C / ${json.current.temp_f}F`);
+
+  const div1 = document.createElement("div");
+  const img = createImg(json.current.iconURL);
+  div1.appendChild(img);
+
   const hourColumns = document.createElement("div");
   hourColumns.className = "hourly";
   
@@ -42,14 +47,19 @@ function render(json) {
       const hourDiv = document.createElement("div");
       const hourPara1 = createPara(hour.temp_c);
       const hourPara2 = createPara(hour.time.slice(-5));
+      const div1 = document.createElement("div");
+      const img = createImg(hour.iconURL);
+      div1.appendChild(img);
       hourDiv.appendChild(hourPara1);
       hourDiv.appendChild(hourPara2);
+      hourDiv.appendChild(div1);
       hourColumns.appendChild(hourDiv);
     }
   }
 
   resultDiv.appendChild(p1);
   resultDiv.appendChild(p2);
+  resultDiv.appendChild(div1);
   resultDiv.appendChild(hourColumns);
 }
 
@@ -84,7 +94,7 @@ function processData(json) {
     obj.precip = hour.precip_mm;
     obj.time = hour.time;
     obj.text = hour.condition.text;
-    obj.iconURL = hour.condition.iconURL;
+    obj.iconURL = hour.condition.icon;
     return obj;
   });
 
