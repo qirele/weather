@@ -5,10 +5,39 @@
 }
 
 body {
-  background: black;
   color: white;
 }
 
 img {
   max-width: 250px;
+}
+
+h1 {
+  text-align: center;
+}
+
+.wrapper {
+  background: black;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.hourly {
+  display: flex;
+  gap: 5px;
+}
+
+.hourly > div {
+  flex: 1;
+  height: 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+
+  background: darkred;
 }

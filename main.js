@@ -9,18 +9,48 @@ async function handleSubmit(e) {
   
   const location = form.location.value.replace("", "+");
 
-  const responseJson = await hitAPI(location);
-  console.clear();
-  console.log(responseJson);
-  const json = processData(responseJson);
+  const originalJson = await hitAPI(location);
+  const processedJson = processData(originalJson);
 
+  console.clear();
+  console.log(originalJson);
+  
+  render(processedJson);
+}
+
+function render(json) {
+  console.log(json);
   console.log("Weather for:");
   console.log(`${json.location.name}, ${json.location.country} ${json.location.region}`);
-  console.log("Current temperature:");
-  console.log(`${json.current.temp_c}C or ${json.current.temp_f}F`);
+  console.log(`Current temperature: ${json.current.temp_c}C / ${json.current.temp_f}F`);
+  console.log(`icon: ${json.current.iconURL}`);
   for (const hour of json.hour) {
-    console.log(`Hour: ${hour.time}, temp: ${hour.temp_c}C/${hour.temp_f}F`);
+    console.log(`Hour: ${hour.time.slice(-5)}, temp: ${hour.temp_c}C / ${hour.temp_f}F`);
   }
+
+  while (resultDiv.firstChild) {
+    resultDiv.removeChild(resultDiv.firstChild);
+  }
+
+  const p1 = createPara(`Location: ${json.location.name}, ${json.location.country}`);
+  const p2 = createPara(`Temperature now: ${json.current.temp_c}C / ${json.current.temp_f}F`);
+  const hourColumns = document.createElement("div");
+  hourColumns.className = "hourly";
+  
+  for (const [idx, hour] of json.hour.entries()) {
+    if (idx % 3 === 0) {
+      const hourDiv = document.createElement("div");
+      const hourPara1 = createPara(hour.temp_c);
+      const hourPara2 = createPara(hour.time.slice(-5));
+      hourDiv.appendChild(hourPara1);
+      hourDiv.appendChild(hourPara2);
+      hourColumns.appendChild(hourDiv);
+    }
+  }
+
+  resultDiv.appendChild(p1);
+  resultDiv.appendChild(p2);
+  resultDiv.appendChild(hourColumns);
 }
 
 async function hitAPI(location) { // this returns a promise
@@ -36,7 +66,9 @@ function processData(json) {
   object.current = {
     temp_c: json.current.temp_c,
     temp_f: json.current.temp_f,
-    precip: json.current.precip_mm ,
+    precip: json.current.precip_mm,
+    text: json.current.condition.text,
+    iconURL: json.current.condition.icon,
   };
 
   object.location = {
@@ -51,53 +83,13 @@ function processData(json) {
     obj.temp_f = hour.temp_f;
     obj.precip = hour.precip_mm;
     obj.time = hour.time;
+    obj.text = hour.condition.text;
+    obj.iconURL = hour.condition.iconURL;
     return obj;
   });
 
   return object;
 }
-
-
-// async function handleSubmit(e) {
-//   e.preventDefault();
-//   if (form.location.value === "") return;
-//
-//   try {
-//     const response = await fetch(URL)
-//     const json = await response.json();
-//     console.log(json);
-//     jsonData = json;
-//
-//     while (resultDiv.firstChild) {
-//       resultDiv.removeChild(resultDiv.firstChild);
-//     }
-//
-//     if (json.error) {
-//       console.log(json.error.message);
-//       resultDiv.appendChild(createPara(`Error: ${json.error.message}`));
-//       return;
-//     }
-//
-//     resultDiv.appendChild(createPara(`Location name: ${json.location.name}`));
-//     resultDiv.appendChild(createPara(`Location country: ${json.location.country}`));
-//     resultDiv.appendChild(createPara(`Location region: ${json.location.region}`));
-//
-//     if (json.current.temp_c > 20) {
-//       resultDiv.appendChild(createPara(`temperature: ${json.current.temp_c}C (too hot)`));
-//       resultDiv.appendChild(createImg("./imgs/sunhot.jpg"));
-//     } else {
-//       resultDiv.appendChild(createPara(`temperature: ${json.current.temp_c}C (too cold)`));
-//       resultDiv.appendChild(createImg("./imgs/coldasheck.jpg"));
-//     }
-//
-//     resultDiv.appendChild(createPara(`Humidity: ${json.current.precip_mm}mm`));
-//     resultDiv.appendChild(createPara(`Condition: ${json.current.condition.text}`));
-//     resultDiv.appendChild(createImg(json.current.condition.icon));
-//
-//   } catch (err) {
-//     console.log(`Something went wrong in fetching: ${err}`);
-//   }
-// }
 
 function createPara(str) {
   const p = document.createElement('p');

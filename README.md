@@ -29,17 +29,15 @@ function processData(json) {
         region: json.location.region
     };
 
-    object.forecastday = [
-        hour: [
-            json.forecast.forecastday[0].hour.map(hour => {
-                const obj = {};
-                obj.temp_c = hour.temp_c;
-                obj.temp_f = hour.temp_f;
-                obj.precip = hour.precip_mm;
-                return obj;
-            })
-        ]
-    ];
+    object.hour = 
+        json.forecast.forecastday[0].hour.map(hour => {
+            const obj = {};
+            obj.temp_c = hour.temp_c;
+            obj.temp_f = hour.temp_f;
+            obj.precip = hour.precip_mm;
+            obj.time = time
+            return obj;
+        })
 
     return object;
 }
@@ -53,10 +51,29 @@ async function handleSubmit(event) {
     
     const location = form.location.replace("", "+");
     const URL = `https://www.api.com/json?key=123&location=${location}`;
-    
+
     // now hit the api
     const responseJson = await hitAPI(location);
     const json = processData(responseJson);
     
     console.log(json);
 }
+
+// what now tho, i got my hourly forecast
+// display the weather info like that sorta:
+
+5         6      5         6     5         6      
+
+00:00   03:00    06:00   09:00   12:00   15:00    
+
+<div class="hourly"> display flex;
+    div
+        div "2"
+        div "00:00"
+    div
+        div "2"
+        div "00:00"
+</div>
+
+how to make the array smaller so that it only prints 00:00, 03:00, 06:00 etc
+print only the third element
