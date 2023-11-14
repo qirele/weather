@@ -6,6 +6,7 @@
 
 body {
   color: white;
+  font-size: 1.2rem;
 }
 
 img {
@@ -16,8 +17,9 @@ h1 {
   text-align: center;
 }
 
+
 .wrapper {
-  background: black;
+  background: rgb(36, 36, 36);
   min-height: 100vh;
 }
 
@@ -28,7 +30,7 @@ h1 {
 
 .hourly {
   display: flex;
-  gap: 5px;
+  gap: 1px;
 }
 
 .hourly > div {
@@ -38,5 +40,33 @@ h1 {
   align-items: center;
   gap: 20px;
 
-  background: darkred;
+  background: rgb(78, 58, 37);
+  text-align: center;
+}
+
+.current-temp {
+  display: flex;
+  align-items: center;
+}
+
+.current-temp > div:last-child {
+  display: flex;
+  gap: 10px
+}
+
+.current-temp button {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+.temp-value {
+  font-size: 2.5rem;
+  color: rgb(246, 220, 255);
+}
+
+.current-temp button.selected{
+  font-size: 1.5rem;
+  color: rgb(168, 210, 225);
 }
