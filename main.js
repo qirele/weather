@@ -31,41 +31,53 @@ function render(json) {
   const div1 = document.createElement("div");
   div1.className = "current-temp";
 
+  const div2 = document.createElement("div");
+  div2.className = "current-temp-left";
+
+  const div3 = document.createElement("div");
+  div3.className = "current-temp-right";
+
+  // ==================current temp left==============================
+  const imgDiv = document.createElement("div");
+  const img = createImg(json.current.iconURL);
+  imgDiv.appendChild(img);
+
+  const p2 = createPara("");
+  p2.className = "temp-value";
+  p2.textContent = `${renderCelcius ? json.current.temp_c : json.current.temp_f}`;
+
   const btnC = document.createElement("button");
   btnC.innerHTML = "C&deg;"; // forgive me for using this instead of textContent PLEAASE
-  const btnF = document.createElement("button");
-  btnF.innerHTML = "F&deg;"; // how else would i embed html special codes in js??!?! (im sure there is a way)
+  btnC.className = `${renderCelcius ? `selected` : ``}`;
   btnC.addEventListener("click", () => {
     renderCelcius = true;
     render(json);
   });
+
+  const btnF = document.createElement("button");
+  btnF.innerHTML = "F&deg;"; // how else would i embed html special codes in js??!?! (im sure there is a way)
+  btnF.className = `${!renderCelcius ? `selected` : ``}`;
   btnF.addEventListener("click", () => {
     renderCelcius = false;
     render(json);
   });
 
-  const div2 = document.createElement("div"); 
-  const para1 = createPara("");
-  para1.className = "temp-value";
-  if (renderCelcius) {
-    para1.textContent = json.current.temp_c;
-    btnC.className = "selected";
-  } else {
-    para1.textContent = json.current.temp_f;
-    btnF.className = "selected";
-  }
-  div2.appendChild(para1);
+  div2.appendChild(imgDiv);
+  div2.appendChild(p2);
   div2.appendChild(btnC);
   div2.appendChild(btnF);
+  // ==================current temp left==============================
 
-  const imgDiv = document.createElement("div");
-  const img = createImg(json.current.iconURL);
-  imgDiv.appendChild(img);
-
-  div1.appendChild(imgDiv);
-  div1.appendChild(div2);
-
+  // ==================current temp right=============================
+  const currentDay = new Intl.DateTimeFormat("en-US", {weekday: 'long'}).format();
+  const p4 = createPara(`${currentDay} ${json.current.lastUpdated}`);
   const p3 = createPara(json.current.text);
+  div3.appendChild(p4);
+  div3.appendChild(p3);
+  // ==================current temp right=============================
+  
+  div1.appendChild(div2);
+  div1.appendChild(div3);
 
   const hourColumns = document.createElement("div");
   hourColumns.className = "hourly";
@@ -73,7 +85,7 @@ function render(json) {
   for (const [idx, hour] of json.hour.entries()) {
     if (idx % 3 === 0) {
       const hourDiv = document.createElement("div");
-      const hourPara1 = createPara(`${renderCelcius ? hour.temp_c : hour.temp_f}`);
+      const hourPara1 = createPara(`${renderCelcius ? Math.round(hour.temp_c) : Math.round(hour.temp_f)}`);
       hourPara1.className = "temp-value";
       const hourPara2 = createPara(hour.time.slice(-5));
       const div1 = document.createElement("div");
@@ -91,8 +103,8 @@ function render(json) {
 
   resultDiv.appendChild(p1);
   resultDiv.appendChild(div1);
-  resultDiv.appendChild(p3);
   resultDiv.appendChild(hourColumns);
+
 }
 
 async function hitAPI(location) { // this returns a promise
@@ -111,6 +123,7 @@ function processData(json) {
     precip: json.current.precip_mm,
     text: json.current.condition.text,
     iconURL: json.current.condition.icon,
+    lastUpdated: json.current.last_updated.slice(-5),
   };
 
   object.location = {

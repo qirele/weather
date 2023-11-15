@@ -46,12 +46,16 @@ h1 {
 
 .current-temp {
   display: flex;
-  align-items: center;
 }
 
-.current-temp > div:last-child {
+.current-temp > div {
+  flex: 1;
+}
+
+.current-temp-left {
   display: flex;
-  gap: 10px
+  align-items: center;
+  gap: 5px;
 }
 
 .current-temp button {
