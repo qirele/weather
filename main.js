@@ -2,13 +2,15 @@ const form = document.querySelector('form');
 const resultDiv = document.querySelector('#results');
 
 let renderCelcius = true;
+let renderDayIdx = 0;
+let clickedOnADay = false;
 
 form.addEventListener('submit', handleSubmit);
 
 async function handleSubmit(e) {
   e.preventDefault(); 
   if (form.location.value === "") return;
-  
+
   const location = form.location.value.replace("", "+");
 
   const originalJson = await hitAPI(location);
@@ -17,7 +19,12 @@ async function handleSubmit(e) {
   console.clear();
   console.log(originalJson);
   console.log(processedJson);
-  
+
+  // reset the state after user typed new location
+  renderCelcius = true;
+  renderDayIdx = 0;
+  clickedOnADay = false;
+
   render(processedJson);
 }
 
@@ -25,6 +32,7 @@ function render(json) {
   while (resultDiv.firstChild) {
     resultDiv.removeChild(resultDiv.firstChild);
   }
+
 
   const p1 = createPara(`Results for: ${json.location.name}, ${json.location.country}`);
 
@@ -61,12 +69,10 @@ function render(json) {
     renderCelcius = false;
     render(json);
   });
-
   div2.appendChild(imgDiv);
   div2.appendChild(p2);
   div2.appendChild(btnC);
   div2.appendChild(btnF);
-  // ==================current temp left==============================
 
   // ==================current temp right=============================
   const currentDay = new Intl.DateTimeFormat("en-US", {weekday: 'long'}).format();
@@ -74,18 +80,28 @@ function render(json) {
   const p3 = createPara(json.current.text);
   div3.appendChild(p4);
   div3.appendChild(p3);
-  // ==================current temp right=============================
-  
+
+  if (clickedOnADay) { // replace values to the renderDayIdx day
+    const clickedDay = json.days[renderDayIdx];
+    img.src = clickedDay.iconURL;
+    p2.textContent = `${renderCelcius ? clickedDay.avgtemp_c : clickedDay.avgtemp_f}`;
+    const clickedDayName = new Intl.DateTimeFormat("en-US", {weekday: 'long'}).format(new Date(clickedDay.date));
+    p4.textContent = clickedDayName;
+    p3.textContent = clickedDay.text;
+  }
+
   div1.appendChild(div2);
   div1.appendChild(div3);
 
   const hourColumns = document.createElement("div");
   hourColumns.className = "hourly";
   
-  for (const [idx, hour] of json.hour.entries()) {
+  // hourly div display here
+  for (const [idx, hour] of json.days[renderDayIdx].hour.entries()) {
     if (idx % 3 === 0) {
       const hourDiv = document.createElement("div");
       const hourPara1 = createPara(`${renderCelcius ? Math.round(hour.temp_c) : Math.round(hour.temp_f)}`);
+      hourPara1.innerHTML += "&deg;";
       hourPara1.className = "temp-value";
       const hourPara2 = createPara(hour.time.slice(-5));
       const div1 = document.createElement("div");
@@ -100,15 +116,48 @@ function render(json) {
       hourColumns.appendChild(hourDiv);
     }
   }
+  
+  const daysDiv = document.createElement("div");
+  daysDiv.className = "days";
+
+  for (const [idx, day] of json.days.entries()) {
+    const dayDiv = document.createElement("div");
+    dayDiv.className = `day ${renderDayIdx === idx ? `selected` : ``}`;
+    dayDiv.addEventListener("click", () => {
+      renderDayIdx = idx;
+      clickedOnADay = true;
+      render(json);
+    });
+
+    const dayInQuestion = new Intl.DateTimeFormat("en-US", {weekday: 'long'}).format(new Date(day.date));
+    const p0 = createPara(dayInQuestion.toString());
+
+    const p1 = document.createElement("p");
+    p1.innerHTML = `${renderCelcius ? day.maxtemp_c : day.maxtemp_f}&deg; ; ${renderCelcius ? day.mintemp_c : day.mintemp_f}&deg;`;
+
+    const divImg = document.createElement("div");
+    const img = createImg(day.iconURL);
+    divImg.appendChild(img);
+
+    const p2 = createPara(day.text);
+
+    dayDiv.appendChild(p0);
+    dayDiv.appendChild(p1);
+    dayDiv.appendChild(divImg);
+    dayDiv.appendChild(p2);
+
+    daysDiv.appendChild(dayDiv);
+  }
 
   resultDiv.appendChild(p1);
   resultDiv.appendChild(div1);
   resultDiv.appendChild(hourColumns);
+  resultDiv.appendChild(daysDiv);
 
 }
 
 async function hitAPI(location) { // this returns a promise
-  const URL = `http://api.weatherapi.com/v1/forecast.json?key=b8981b263931411ba6b211548230111&q=${location}&days=1&aqi=no&alerts=no`;
+  const URL = `http://api.weatherapi.com/v1/forecast.json?key=b8981b263931411ba6b211548230111&q=${location}&days=3&aqi=no&alerts=no`;
   const response = await fetch(URL);
   const json = await response.json();
   return json;
@@ -132,16 +181,32 @@ function processData(json) {
     region: json.location.region
   };
 
-  object.hour = json.forecast.forecastday[0].hour.map(hour => {
-    const obj = {};
-    obj.temp_c = hour.temp_c;
-    obj.temp_f = hour.temp_f;
-    obj.precip = hour.precip_mm;
-    obj.time = hour.time;
-    obj.text = hour.condition.text;
-    obj.iconURL = hour.condition.icon;
-    return obj;
+  object.days = json.forecast.forecastday.map(day => {
+    const dayObj = {};
+    dayObj.date = day.date;
+    dayObj.avgtemp_c = day.day.avgtemp_c; 
+    dayObj.avgtemp_f = day.day.avgtemp_f; 
+    dayObj.mintemp_c = day.day.mintemp_c;
+    dayObj.maxtemp_c = day.day.maxtemp_c;
+    dayObj.mintemp_f = day.day.mintemp_f;
+    dayObj.maxtemp_f = day.day.maxtemp_f;
+    dayObj.text = day.day.condition.text;
+    dayObj.iconURL = day.day.condition.icon;
+
+    dayObj.hour = day.hour.map(hour => {
+      const obj = {};
+      obj.temp_c = hour.temp_c;
+      obj.temp_f = hour.temp_f;
+      obj.precip = hour.precip_mm;
+      obj.time = hour.time;
+      obj.text = hour.condition.text;
+      obj.iconURL = hour.condition.icon;
+      return obj;
+    });
+
+    return dayObj;
   });
+
 
   return object;
 }
