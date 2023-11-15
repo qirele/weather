@@ -13,6 +13,9 @@ async function handleSubmit(e) {
 
   const location = form.location.value.replace("", "+");
 
+  // here we gonna be displaying that loading animation bruuuuuuh
+  resultDiv.prepend(loadingComponent());
+
   const originalJson = await hitAPI(location);
   const processedJson = processData(originalJson);
 
@@ -30,9 +33,9 @@ async function handleSubmit(e) {
 
 function render(json) {
   while (resultDiv.firstChild) {
+    // TODO: remove event listeners here, btnC, btnF, dayDiv listener too
     resultDiv.removeChild(resultDiv.firstChild);
   }
-
 
   const p1 = createPara(`Results for: ${json.location.name}, ${json.location.country}`);
 
@@ -57,18 +60,21 @@ function render(json) {
   const btnC = document.createElement("button");
   btnC.innerHTML = "C&deg;"; // forgive me for using this instead of textContent PLEAASE
   btnC.className = `${renderCelcius ? `selected` : ``}`;
-  btnC.addEventListener("click", () => {
+  btnC.addEventListener("click", handleCelciusClick);
+  function handleCelciusClick() {
     renderCelcius = true;
     render(json);
-  });
+  }
 
   const btnF = document.createElement("button");
   btnF.innerHTML = "F&deg;"; // how else would i embed html special codes in js??!?! (im sure there is a way)
   btnF.className = `${!renderCelcius ? `selected` : ``}`;
-  btnF.addEventListener("click", () => {
+  btnF.addEventListener("click", handleFahrClick);
+  function handleFahrClick() {
     renderCelcius = false;
     render(json);
-  });
+  }
+
   div2.appendChild(imgDiv);
   div2.appendChild(p2);
   div2.appendChild(btnC);
@@ -153,7 +159,6 @@ function render(json) {
   resultDiv.appendChild(div1);
   resultDiv.appendChild(hourColumns);
   resultDiv.appendChild(daysDiv);
-
 }
 
 async function hitAPI(location) { // this returns a promise
@@ -207,7 +212,6 @@ function processData(json) {
     return dayObj;
   });
 
-
   return object;
 }
 
@@ -223,4 +227,10 @@ function createImg(url) {
   return img;
 }
 
+// loading component
+function loadingComponent() {
+  const div = document.createElement("div");
+  div.className = "lds-dual-ring";
+  return div;
+}
 
