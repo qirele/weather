@@ -11,14 +11,17 @@ async function handleSubmit(e) {
   e.preventDefault(); 
   if (form.location.value === "") return;
 
-  const location = form.location.value.replace("", "+");
+  const location = form.location.value.replace(" ", "+");
 
   // here we gonna be displaying that loading animation bruuuuuuh
   resultDiv.prepend(loadingComponent());
 
   const originalJson = await hitAPI(location);
-  const processedJson = processData(originalJson);
+  if (originalJson === -1) {
+    return;
+  }
 
+  const processedJson = processData(originalJson);
   console.clear();
   console.log(originalJson);
   console.log(processedJson);
@@ -29,6 +32,14 @@ async function handleSubmit(e) {
   clickedOnADay = false;
 
   render(processedJson);
+}
+
+function renderError(text) {
+  while (resultDiv.firstChild) {
+    // TODO: remove event listeners here, btnC, btnF, dayDiv listener too
+    resultDiv.removeChild(resultDiv.firstChild);
+  }
+  resultDiv.appendChild(createPara(text));
 }
 
 function render(json) {
@@ -163,9 +174,19 @@ function render(json) {
 
 async function hitAPI(location) { // this returns a promise
   const URL = `http://api.weatherapi.com/v1/forecast.json?key=b8981b263931411ba6b211548230111&q=${location}&days=3&aqi=no&alerts=no`;
-  const response = await fetch(URL);
-  const json = await response.json();
-  return json;
+  try {
+    const response = await fetch(URL);
+    if (response.status === 400) {
+      renderError("Bad Request. Check your input brochoho.");
+      return -1;
+    }
+    const json = await response.json();
+    return json;
+  } catch (err) {
+    // Handle other errors (e.g., network issues)
+    console.error("An error occurred:", err);
+    renderError("An error occurred while fetching data. Please try again."); 
+  }
 }
 
 // function that processes json and returns object with only the data that app needs
