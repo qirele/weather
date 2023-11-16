@@ -173,7 +173,7 @@ function render(json) {
 }
 
 async function hitAPI(location) { // this returns a promise
-  const URL = `http://api.weatherapi.com/v1/forecast.json?key=b8981b263931411ba6b211548230111&q=${location}&days=3&aqi=no&alerts=no`;
+  const URL = `https://api.weatherapi.com/v1/forecast.json?key=b8981b263931411ba6b211548230111&q=${location}&days=3&aqi=no&alerts=no`;
   try {
     const response = await fetch(URL);
     if (response.status === 400) {
