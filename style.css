@@ -194,3 +194,21 @@ h1 {
   background-repeat: no-repeat;
   background-position: center bottom;
 }
+
+.cold {
+  background-image: linear-gradient(
+    rgba(0, 0, 0, 0.5), 
+    rgba(0, 0, 0, 0.5)
+    ), url("./imgs/cold.jpg");
+  background-repeat: no-repeat;
+  background-position: center bottom;
+}
+
+.normal {
+  background-image: linear-gradient(
+    rgba(0, 0, 0, 0.5), 
+    rgba(0, 0, 0, 0.5)
+    ), url("./imgs/normalweather.jpg");
+  background-repeat: no-repeat;
+  background-position: center bottom;
+}

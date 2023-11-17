@@ -170,9 +170,6 @@ function render(json) {
 
     const p2 = createPara(day.text);
 
-
-
-
     dayDiv.appendChild(p0);
     dayDiv.appendChild(p1);
     dayDiv.appendChild(divImg);
@@ -181,37 +178,43 @@ function render(json) {
     daysDiv.appendChild(dayDiv);
   }
 
-  const renderedDay = json.days[renderDayIdx];
-  // display quirky image based on temperature
-  if (renderedDay.maxtemp_c >= 15) {
-    resultDiv.classList.add("hot-sun");    
-    resultDiv.classList.remove("cold-snow");    
-    resultDiv.classList.remove("rain");    
-    resultDiv.classList.remove("snowflakes");
-  } else {
-    if (renderedDay.dailyRainChance > 50) {
-      resultDiv.classList.add("rain");
-      resultDiv.classList.remove("hot-sun");
-      resultDiv.classList.remove("cold-snow");
-      resultDiv.classList.remove("snowflakes");
-      if (renderedDay.dailySnowChance > 50) {
-        resultDiv.classList.add("snowflakes");
-        resultDiv.classList.remove("hot-sun");
-        resultDiv.classList.remove("cold-snow");
-        resultDiv.classList.remove("rain");
-      }
-    } else {
-      resultDiv.classList.add("cold-snow");
-      resultDiv.classList.remove("rain");
-      resultDiv.classList.remove("hot-sun");
-      resultDiv.classList.remove("snowflakes");
-    }
-  }
-
   resultDiv.appendChild(p1);
   resultDiv.appendChild(div1);
   resultDiv.appendChild(hourColumns);
   resultDiv.appendChild(daysDiv);
+  
+  bgBasedOnData(json);
+}
+
+function bgBasedOnData(json) {
+  // display quirky image based on temperature
+  const renderedDay = json.days[renderDayIdx];
+  if (renderedDay.maxtemp_c >= 22) {
+    resultDiv.className = "hot-sun";
+    return;
+  }
+
+  if (renderedDay.avgtemp_c <= -10) {
+    resultDiv.className = "cold-snow";
+    return;
+  }
+
+  if (renderedDay.avgtemp_c > -10 && renderedDay.avgtemp_c <= 1) {
+    if (renderedDay.dailySnowChance > 50) {
+      resultDiv.className = "snowflakes";
+    }
+    resultDiv.className = "cold";
+    return;
+  }
+
+  if (renderedDay.avgtemp_c > 1 && renderedDay.avgtemp_c < 22) {
+    if (renderedDay.dailyRainChance > 50) {
+      resultDiv.className = "rain";
+      return;
+    }
+    resultDiv.className = "normal";
+    return;
+  }
 }
 
 async function hitAPI(location) { // this returns a promise
