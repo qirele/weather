@@ -170,12 +170,42 @@ function render(json) {
 
     const p2 = createPara(day.text);
 
+
+
+
     dayDiv.appendChild(p0);
     dayDiv.appendChild(p1);
     dayDiv.appendChild(divImg);
     dayDiv.appendChild(p2);
 
     daysDiv.appendChild(dayDiv);
+  }
+
+  const renderedDay = json.days[renderDayIdx];
+  // display quirky image based on temperature
+  if (renderedDay.maxtemp_c >= 15) {
+    resultDiv.classList.add("hot-sun");    
+    resultDiv.classList.remove("cold-snow");    
+    resultDiv.classList.remove("rain");    
+    resultDiv.classList.remove("snowflakes");
+  } else {
+    if (renderedDay.dailyRainChance > 50) {
+      resultDiv.classList.add("rain");
+      resultDiv.classList.remove("hot-sun");
+      resultDiv.classList.remove("cold-snow");
+      resultDiv.classList.remove("snowflakes");
+      if (renderedDay.dailySnowChance > 50) {
+        resultDiv.classList.add("snowflakes");
+        resultDiv.classList.remove("hot-sun");
+        resultDiv.classList.remove("cold-snow");
+        resultDiv.classList.remove("rain");
+      }
+    } else {
+      resultDiv.classList.add("cold-snow");
+      resultDiv.classList.remove("rain");
+      resultDiv.classList.remove("hot-sun");
+      resultDiv.classList.remove("snowflakes");
+    }
   }
 
   resultDiv.appendChild(p1);

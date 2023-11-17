@@ -69,7 +69,7 @@ h1 {
   gap: 20px;
   padding: 10px 10px 30px 10px;
 
-  background: rgb(78, 58, 37);
+  background: rgba(78, 58, 37, 0.7);
   text-align: center;
 }
 
@@ -77,6 +77,12 @@ h1 {
   display: flex;
   justify-content: space-between;
   margin: 20px 0;
+}
+
+.current-temp-right {
+  font-size: 1.45rem;
+  background: rgba(17, 26, 28, 0.73);
+  padding: 10px 20px;
 }
 
 .current-temp-left {
@@ -114,12 +120,12 @@ h1 {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: rgb(44, 44, 48);
+  background: rgba(45, 44, 48, 0.7);
   padding: 10px 10px 30px 10px;
 }
 
 .day:hover {
-  background: rgb(61, 61, 65);
+  background: rgb(61, 61, 65, 0.7);
 }
 
 .day.selected {
@@ -150,4 +156,41 @@ h1 {
   100% {
     transform: rotate(360deg);
   }
+}
+
+.hot-sun {
+  background-image: 
+    linear-gradient(
+    rgba(0, 0, 0, 0.5), 
+    rgba(0, 0, 0, 0.5)
+    ), url("./imgs/sunhot.jpg");
+  background-repeat: no-repeat;
+  background-position: center top;
+}
+
+.cold-snow {
+  background-image: linear-gradient(
+    rgba(0, 0, 0, 0.5), 
+    rgba(0, 0, 0, 0.5)
+    ), url("./imgs/coldasheck.jpg");
+  background-repeat: no-repeat;
+  background-position: center bottom;
+}
+
+.rain {
+  background-image: linear-gradient(
+    rgba(0, 0, 0, 0.7), 
+    rgba(0, 0, 0, 0.7)
+    ), url("./imgs/rain.jpg");
+  background-repeat: no-repeat;
+  background-position: center bottom;
+}
+
+.snowflakes {
+  background-image: linear-gradient(
+    rgba(0, 0, 0, 0.5), 
+    rgba(0, 0, 0, 0.5)
+    ), url("./imgs/snow.jpg");
+  background-repeat: no-repeat;
+  background-position: center bottom;
 }
