@@ -86,10 +86,19 @@ function render(json) {
     render(json);
   }
 
+  // create precipitation , humidity para's 
+  const precipHumidityDiv = document.createElement("div");
+  const precipPara = createPara(`Precipitation: ${json.current.precip}mm`);
+  const humidityPara = createPara(`Humidity: ${json.current.humidity}%`);
+  precipHumidityDiv.appendChild(precipPara);
+  precipHumidityDiv.appendChild(humidityPara);
+
   div2.appendChild(imgDiv);
   div2.appendChild(p2);
   div2.appendChild(btnC);
   div2.appendChild(btnF);
+  div2.appendChild(precipHumidityDiv);
+   
 
   // ==================current temp right=============================
   const currentDay = new Intl.DateTimeFormat("en-US", {weekday: 'long'}).format();
@@ -102,6 +111,9 @@ function render(json) {
     const clickedDay = json.days[renderDayIdx];
     img.src = clickedDay.iconURL;
     p2.textContent = `${renderCelcius ? clickedDay.avgtemp_c : clickedDay.avgtemp_f}`;
+    precipPara.textContent = `Rain/Snow chance: ${clickedDay.dailyRainChance}%/${clickedDay.dailySnowChance}%`;
+    humidityPara.textContent = `Humidity: ${clickedDay.avghumidity}%`;
+
     const clickedDayName = new Intl.DateTimeFormat("en-US", {weekday: 'long'}).format(new Date(clickedDay.date));
     p4.textContent = clickedDayName;
     p3.textContent = clickedDay.text;
@@ -196,6 +208,7 @@ function processData(json) {
     temp_c: json.current.temp_c,
     temp_f: json.current.temp_f,
     precip: json.current.precip_mm,
+    humidity: json.current.humidity,
     text: json.current.condition.text,
     iconURL: json.current.condition.icon,
     lastUpdated: json.current.last_updated.slice(-5),
@@ -216,6 +229,9 @@ function processData(json) {
     dayObj.maxtemp_c = day.day.maxtemp_c;
     dayObj.mintemp_f = day.day.mintemp_f;
     dayObj.maxtemp_f = day.day.maxtemp_f;
+    dayObj.avghumidity = day.day.avghumidity;
+    dayObj.dailyRainChance = day.day.daily_chance_of_rain;
+    dayObj.dailySnowChance = day.day.daily_chance_of_snow;
     dayObj.text = day.day.condition.text;
     dayObj.iconURL = day.day.condition.icon;
 
